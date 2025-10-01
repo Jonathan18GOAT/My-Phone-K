@@ -177,19 +177,19 @@
     select.appendChild(opt);
   });
 
-  select.addEventListener('change', () => {
-    const selectedName = select.value;
-    if (!selectedName) return;
+select.addEventListener('change', () => {
+  const selectedName = select.value;
+  if (!selectedName) return;
 
-    const product = products.find(p => p.name === selectedName);
-    if (!product) return;
+  const product = products.find(p => p.name === selectedName);
+  if (!product) return;
 
-    cart.push(product);
-    updateCartTable(); // ✅ Call the update function here
-  });
+  cart.push(product);
+  updateCartTable();
 
-  // ✅ Moved this function OUTSIDE the event listener
-  function updateCartTable() {
+  // ✅ Reset the dropdown to the default option
+  select.value = "";
+}); {
     cartTable.style.display = "table";
     tbody.innerHTML = "";
 
@@ -229,5 +229,6 @@
 
 
 </body>
+
 
 </html>
