@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Your Kart</title>
+  <style>
+  body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: #fff;
+    margin: 0;
+    padding: 0;
+  }
+
+  header {
+    background-color: #2e2e2e;
+    padding: 40px 20px;
+    text-align: center;
+    font-size: 120px;
+    font-weight: bold;
+  }
+
+  .blue {
+    color: #007BFF;
+  }
+
+  .yellow {
+    color: #FFD700;
+  }
+
+  .container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 0 20px;
+  }
+
+  h2 {
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+
+  label, select {
+    font-size: 16px;
+  }
+
+  select {
+    margin-left: 10px;
+    padding: 5px;
+  }
+
+  table {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
+  }
+
+  table, th, td {
+    border: 1px solid #aaa;
+  }
+
+  th, td {
+    padding: 10px;
+    text-align: left;
+  }
+
+  tfoot td {
+    font-weight: bold;
+  }
+
+  /* ✅ Button: white bg, black text */
+  .btn {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: white;
+    color: black;
+    border: 2px solid black;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .btn:hover {
+    background-color: #f4f4f4;
+  }
+
+  .thankyou {
+    margin-top: 20px;
+    font-size: 18px;
+    color: #333;
+  }
+
+  .thankyou a {
+    color: #007BFF;
+    text-decoration: underline;
+  }
+</style>
+
+</head>
+<body>
+
+<!-- Header -->
+<header>
+  <span class="blue">Your</span> <span class="yellow">Kart</span>
+</header>
+
+<!-- Main Content -->
+<div class="container">
+  <h2>Product Selection</h2>
+  <label for="productSelect">Choose a product:</label>
+  <select id="productSelect">
+    <option value="">-- Select a product --</option>
+  </select>
+
+  <table id="cartTable" style="display:none;">
+    <thead>
+      <tr>
+        <th>Product</th>
+        <th>Price (₹)</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+    <tfoot>
+      <tr>
+        <td>Dhamakar Deals (15% off) </td>
+        <td id="discount">- ₹0.00</td>
+      </tr>
+      <tr>
+        <td>Amt. Payable</td>
+        <td id="finalAmount">₹0.00</td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <button class="btn" onclick="checkout()">Checkout</button>
+
+  <div class="thankyou" id="thankyouMessage"></div>
+</div>
+
+<script>
+  const products = [
+    { name: "Ever Reddy", price: 180.00 },
+    { name: "Surf Excel", price: 295.00 },
+    { name: "Thatha Salt", price: 40.00 },
+    { name: "Tata Sampann Toor Doll", price: 145.00 },
+    { name: "Eggs", price: 130.00 },
+    { name: "Antique Bread", price: 60.00 },
+    { name: "Bossmati Rice", price: 120.00 },
+    { name: "Rizz Crackers", price: 245.00 },
+    { name: "Air fried Potato Chips", price: 70.00 },
+    { name: "Gurmure Chips", price: 40.00 },
+    { name: "IDiot Batter", price: 95.00 },
+    { name: "Maggi", price: 30.00 },
+    { name: "Nescafe Classic Coffee", price: 385.00 },
+    { name: "Brroke Bond Gold Label", price: 575.00 },
+    { name: "Kanchenjunga Spices", price: 105.00 },
+    { name: "ParleAjji biscuit", price: 75.00 },
+    { name: "Diet Coca Goli Soda", price: 45.00 },
+    { name: "DOUBLE Scoop Ice Cream", price: 80.00 },
+    { name: "Blox fruits Stationery set", price: 400.00 },
+    { name: "First Aid kit", price: 799.00 }
+];
+
+  const select = document.getElementById('productSelect');
+  const tbody = document.querySelector('#cartTable tbody');
+  const cartTable = document.getElementById('cartTable');
+  const discountEl = document.getElementById('discount');
+  const finalAmountEl = document.getElementById('finalAmount');
+  const thankyouMessage = document.getElementById('thankyouMessage');
+
+  let cart = [];
+
+  // Populate dropdown
+  products.forEach(p => {
+    const opt = document.createElement('option');
+    opt.value = p.name;
+    opt.textContent = `${p.name} – ₹${p.price.toLocaleString()}`;
+    select.appendChild(opt);
+  });
+
+  select.addEventListener('change', () => {
+    const selectedName = select.value;
+    if (!selectedName) return;
+
+    const product = products.find(p => p.name === selectedName);
+    if (!product) return;
+
+    cart.push(product);
+    updateCartTable(); // ✅ Call the update function here
+  });
+
+  // ✅ Moved this function OUTSIDE the event listener
+  function updateCartTable() {
+    cartTable.style.display = "table";
+    tbody.innerHTML = "";
+
+    let total = 0;
+
+    if (cart.length === 0) {
+      const emptyRow = document.createElement('tr');
+      emptyRow.innerHTML = `<td>None</td><td>₹0.00</td>`;
+      tbody.appendChild(emptyRow);
+    } else {
+      cart.forEach(p => {
+        const row = document.createElement('tr');
+        row.innerHTML = `<td>${p.name}</td><td>₹${p.price.toLocaleString()}</td>`;
+        tbody.appendChild(row);
+        total += p.price;
+      });
+    }
+
+    const discount = total * 0.15;
+    const final = total - discount;
+
+    discountEl.textContent = `- ₹${discount.toLocaleString(undefined, {maximumFractionDigits:2})}`;
+    finalAmountEl.textContent = `₹${final.toLocaleString(undefined, {maximumFractionDigits:2})}`;
+  }
+
+  function checkout() {
+    if (cart.length === 0) {
+      alert("Add at least one product to checkout!");
+      return;
+    }
+    const total = cart.reduce((sum, p) => sum + p.price, 0);
+    const discount = total * 0.15;
+    const final = total - discount;
+    thankyouMessage.innerHTML = `✅ Thank you! Your total is ₹${final.toLocaleString(undefined, {maximumFractionDigits:2})}. Make payment <a href="https://sites.google.com/view/klipfartkart/home" target="_blank">here</a>.`;
+  }
+</script>
+
+
+</body>
+
+</html>
